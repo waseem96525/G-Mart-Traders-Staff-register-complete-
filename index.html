@@ -1,0 +1,2090 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>G Mart Traders · Staff Attendance & Reports</title>
+  <!-- html2pdf for PDF export -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #eef2f8 0%, #e0e9f2 100%);
+      min-height: 100vh;
+      padding: 1.5rem;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+    }
+
+    .register-container {
+      max-width: 1400px;
+      width: 100%;
+      background: #ffffff;
+      border-radius: 2rem;
+      box-shadow: 0 30px 50px -20px rgba(0, 20, 30, 0.3);
+      padding: 2rem 1.8rem;
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      transition: all 0.2s;
+    }
+
+    /* header */
+    .shop-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1.8rem;
+      border-bottom: 2px solid #e9edf4;
+      padding-bottom: 1.2rem;
+    }
+
+    .shop-title {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .shop-icon {
+      background: #1e3c5c;
+      color: #fff;
+      width: 52px;
+      height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 18px;
+      font-weight: 700;
+      font-size: 1.8rem;
+      box-shadow: 0 10px 16px -8px rgba(0, 0, 0, 0.3);
+    }
+
+    .shop-title h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: #0b2a41;
+    }
+
+    .shop-title .sub {
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: #5f7d9c;
+      background: #e7eef6;
+      padding: 0.25rem 0.9rem;
+      border-radius: 30px;
+      display: inline-block;
+      margin-top: 0.2rem;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .date-badge {
+      background: #1e3c5c;
+      color: white;
+      padding: 0.7rem 1.3rem;
+      border-radius: 60px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      box-shadow: 0 8px 14px -8px rgba(0, 0, 0, 0.3);
+    }
+
+    .theme-toggle {
+      background: #eef3fa;
+      border: none;
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 1.3rem;
+      transition: 0.2s;
+      border: 1px solid #d4e0ec;
+    }
+
+    .theme-toggle:hover {
+      background: #dbe7f3;
+      transform: scale(1.02);
+    }
+
+    /* stats cards */
+    .stats-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .stat-card {
+      flex: 1 1 140px;
+      background: #f8fafd;
+      border-radius: 1.6rem;
+      padding: 1.2rem 1.2rem;
+      border: 1px solid #dde5ef;
+      transition: all 0.15s ease;
+      cursor: default;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 20px -12px rgba(30, 60, 92, 0.2);
+      background: #ffffff;
+    }
+
+    .stat-card .label {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      font-weight: 600;
+      color: #52718e;
+      margin-bottom: 0.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    .stat-card .value {
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: #102b40;
+      line-height: 1.2;
+    }
+
+    .stat-card .value small {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: #5f7d9c;
+    }
+
+    /* toolbar */
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.8rem;
+      margin-bottom: 1.8rem;
+      align-items: center;
+      background: #eef3fa;
+      padding: 0.9rem 1.2rem;
+      border-radius: 2rem;
+    }
+
+    .toolbar input[type="text"],
+    .toolbar input[type="tel"],
+    .toolbar input[type="number"],
+    .toolbar input[type="date"],
+    .toolbar textarea {
+      padding: 0.75rem 1rem;
+      border: 2px solid #cfdceb;
+      border-radius: 60px;
+      font-size: 0.9rem;
+      background: white;
+      transition: 0.15s;
+      outline: none;
+      font-family: inherit;
+    }
+
+    .toolbar input:focus,
+    .toolbar textarea:focus {
+      border-color: #1e3c5c;
+      box-shadow: 0 0 0 4px rgba(30, 60, 92, 0.1);
+    }
+
+    .toolbar button {
+      background: #1e3c5c;
+      color: white;
+      border: none;
+      padding: 0.8rem 1.4rem;
+      border-radius: 60px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: 0.15s;
+      white-space: nowrap;
+      box-shadow: 0 6px 14px -6px #1e3c5c80;
+    }
+
+    .toolbar button:hover {
+      background: #122b41;
+      transform: scale(1.01);
+    }
+
+    .toolbar button:active {
+      transform: scale(0.98);
+    }
+
+    .toolbar button.secondary {
+      background: #ffffff;
+      color: #1e3c5c;
+      border: 2px solid #cddbe9;
+      box-shadow: none;
+    }
+
+    .toolbar button.secondary:hover {
+      background: #e9f0f8;
+      border-color: #a9bed4;
+    }
+
+    /* table */
+    .table-wrapper {
+      overflow-x: auto;
+      border-radius: 1.8rem;
+      border: 1px solid #e2eaf3;
+      background: white;
+      margin-bottom: 1rem;
+      box-shadow: 0 8px 18px -12px rgba(0, 0, 0, 0.15);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 1100px;
+    }
+
+    th {
+      text-align: left;
+      padding: 0.9rem 1rem;
+      background: #f4f8ff;
+      font-weight: 600;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: #1d3d5c;
+      border-bottom: 2px solid #d3e0ee;
+      white-space: nowrap;
+    }
+
+    td {
+      padding: 0.8rem 1rem;
+      border-bottom: 1px solid #e6eef8;
+      color: #1d2e40;
+      font-weight: 500;
+      vertical-align: middle;
+      font-size: 0.88rem;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    tr:hover td {
+      background: #fafdff;
+    }
+
+    .employee-name {
+      font-weight: 600;
+      color: #0d2c44;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      min-width: 160px;
+    }
+
+    .employee-name .avatar {
+      width: 34px;
+      height: 34px;
+      background: #d7e3f0;
+      border-radius: 10px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: #1e3c5c;
+      text-transform: uppercase;
+      flex-shrink: 0;
+    }
+
+    .employee-name .name-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .employee-name .role-badge {
+      font-size: 0.62rem;
+      font-weight: 600;
+      color: #5f7d9c;
+      background: #eef3fa;
+      padding: 0.1rem 0.5rem;
+      border-radius: 30px;
+      display: inline-block;
+      margin-top: 0.1rem;
+      width: fit-content;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .contact-info {
+      font-size: 0.8rem;
+      color: #3d5a78;
+      line-height: 1.3;
+    }
+
+    .contact-info .label {
+      font-weight: 600;
+      color: #52718e;
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    /* status badge */
+    .status-badge {
+      display: inline-block;
+      padding: 0.3rem 0.9rem;
+      border-radius: 50px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+      text-align: center;
+      min-width: 78px;
+    }
+
+    .status-present {
+      background: #dff0e3;
+      color: #146b3a;
+    }
+
+    .status-absent {
+      background: #fbe6e7;
+      color: #a12b2b;
+    }
+
+    .status-late {
+      background: #fff0d6;
+      color: #a16207;
+    }
+
+    /* action buttons */
+    .actions {
+      display: flex;
+      gap: 0.35rem;
+      flex-wrap: wrap;
+    }
+
+    .btn-sm {
+      border: none;
+      padding: 0.4rem 0.7rem;
+      border-radius: 30px;
+      font-weight: 600;
+      font-size: 0.68rem;
+      cursor: pointer;
+      transition: 0.1s;
+      background: white;
+      border: 1.5px solid transparent;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.2rem;
+      white-space: nowrap;
+    }
+
+    .btn-present {
+      background: #e3f1e8;
+      color: #146b3a;
+      border-color: #b8d9c5;
+    }
+
+    .btn-present:hover {
+      background: #c8e5d2;
+      border-color: #90c2a3;
+    }
+
+    .btn-absent {
+      background: #fce9ea;
+      color: #a12b2b;
+      border-color: #f3c6c9;
+    }
+
+    .btn-absent:hover {
+      background: #f7d5d7;
+      border-color: #e6a7ab;
+    }
+
+    .btn-late {
+      background: #fff4e0;
+      color: #a16207;
+      border-color: #f7dfb0;
+    }
+
+    .btn-late:hover {
+      background: #ffe9c4;
+      border-color: #e9c88a;
+    }
+
+    .btn-remove {
+      background: white;
+      color: #7f4f4f;
+      border-color: #e2caca;
+    }
+
+    .btn-remove:hover {
+      background: #f5e4e4;
+      border-color: #ccacac;
+    }
+
+    .btn-report {
+      background: #e8eef8;
+      color: #1e3c5c;
+      border-color: #c2d2e6;
+    }
+
+    .btn-report:hover {
+      background: #d4e1f2;
+      border-color: #a9bed4;
+    }
+
+    .btn-sm:active {
+      transform: scale(0.96);
+    }
+
+    .empty-row td {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: #8399ad;
+      font-weight: 500;
+      font-style: italic;
+    }
+
+    /* footer */
+    .footer-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+
+    .footer-actions .summary {
+      background: #f1f6fd;
+      padding: 0.7rem 1.5rem;
+      border-radius: 60px;
+      font-weight: 500;
+      color: #21465f;
+      font-size: 0.9rem;
+      display: flex;
+      gap: 0.8rem;
+      flex-wrap: wrap;
+    }
+
+    .summary .dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      margin-right: 0.3rem;
+    }
+
+    .dot.green { background: #1e7e34; }
+    .dot.red { background: #c0392b; }
+    .dot.orange { background: #d97706; }
+
+    .btn-group {
+      display: flex;
+      gap: 0.8rem;
+      flex-wrap: wrap;
+    }
+
+    .btn-secondary {
+      background: white;
+      border: 2px solid #cddbe9;
+      padding: 0.7rem 1.4rem;
+      border-radius: 60px;
+      font-weight: 600;
+      color: #1e3c5c;
+      cursor: pointer;
+      transition: 0.15s;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.9rem;
+    }
+
+    .btn-secondary:hover {
+      background: #e9f0f8;
+      border-color: #a9bed4;
+    }
+
+    .btn-primary {
+      background: #1e3c5c;
+      border: 2px solid #1e3c5c;
+      padding: 0.7rem 1.6rem;
+      border-radius: 60px;
+      font-weight: 600;
+      color: white;
+      cursor: pointer;
+      transition: 0.15s;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.9rem;
+    }
+
+    .btn-primary:hover {
+      background: #122b41;
+      border-color: #122b41;
+    }
+
+    .btn-primary:active, .btn-secondary:active {
+      transform: scale(0.97);
+    }
+
+    /* modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 20, 30, 0.5);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 1rem;
+      opacity: 0;
+      visibility: hidden;
+      transition: 0.2s;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal {
+      background: white;
+      max-width: 720px;
+      width: 100%;
+      max-height: 85vh;
+      border-radius: 2rem;
+      padding: 1.8rem;
+      box-shadow: 0 40px 60px -20px rgba(0, 0, 0, 0.4);
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      overflow: hidden;
+    }
+
+    .modal.wide {
+      max-width: 900px;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-header h2 {
+      font-size: 1.5rem;
+      color: #0b2a41;
+    }
+
+    .modal-close {
+      background: #eef3fa;
+      border: none;
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      font-size: 1.4rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #1e3c5c;
+      transition: 0.15s;
+    }
+
+    .modal-close:hover {
+      background: #dbe7f3;
+    }
+
+    .modal-body {
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+      padding-right: 0.3rem;
+    }
+
+    /* form grid inside modal */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.9rem;
+    }
+
+    .form-grid .full-width {
+      grid-column: span 2;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .form-group label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: #52718e;
+    }
+
+    .form-group input,
+    .form-group textarea {
+      padding: 0.7rem 1rem;
+      border: 2px solid #cfdceb;
+      border-radius: 14px;
+      font-size: 0.9rem;
+      outline: none;
+      font-family: inherit;
+      transition: 0.15s;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+      border-color: #1e3c5c;
+      box-shadow: 0 0 0 4px rgba(30, 60, 92, 0.1);
+    }
+
+    .form-group textarea {
+      resize: vertical;
+      min-height: 60px;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 0.8rem;
+      justify-content: flex-end;
+      padding-top: 0.5rem;
+      border-top: 1px solid #e2eaf3;
+      margin-top: 0.5rem;
+    }
+
+    /* report styles */
+    .report-container {
+      background: #fff;
+      border-radius: 1rem;
+      padding: 1.5rem;
+    }
+
+    .report-header {
+      text-align: center;
+      border-bottom: 3px double #1e3c5c;
+      padding-bottom: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .report-header h1 {
+      font-size: 1.8rem;
+      color: #0b2a41;
+      letter-spacing: 0.05em;
+    }
+
+    .report-header .shop-sub {
+      font-size: 0.9rem;
+      color: #5f7d9c;
+      margin-top: 0.2rem;
+    }
+
+    .report-header .report-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #1e3c5c;
+      margin-top: 0.8rem;
+      background: #eef3fa;
+      display: inline-block;
+      padding: 0.3rem 1.5rem;
+      border-radius: 30px;
+    }
+
+    .report-profile {
+      display: flex;
+      align-items: center;
+      gap: 1.2rem;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid #e2eaf3;
+    }
+
+    .report-avatar {
+      width: 72px;
+      height: 72px;
+      background: #1e3c5c;
+      color: white;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .report-profile-info h2 {
+      font-size: 1.5rem;
+      color: #0b2a41;
+    }
+
+    .report-profile-info .role {
+      font-size: 0.9rem;
+      color: #5f7d9c;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .report-details-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.8rem 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .report-detail-item {
+      display: flex;
+      flex-direction: column;
+      padding: 0.6rem 0.9rem;
+      background: #f8fafd;
+      border-radius: 12px;
+      border: 1px solid #e2eaf3;
+    }
+
+    .report-detail-item .dl {
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: #52718e;
+      margin-bottom: 0.15rem;
+    }
+
+    .report-detail-item .dv {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #0b2a41;
+      word-break: break-word;
+    }
+
+    .report-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 0.5rem;
+      font-size: 0.82rem;
+    }
+
+    .report-table th {
+      background: #1e3c5c;
+      color: white;
+      padding: 0.6rem 0.8rem;
+      text-align: left;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .report-table td {
+      padding: 0.55rem 0.8rem;
+      border-bottom: 1px solid #e2eaf3;
+      color: #1d2e40;
+    }
+
+    .report-table tr:nth-child(even) td {
+      background: #f8fafd;
+    }
+
+    .report-table .total-row td {
+      font-weight: 700;
+      background: #eef3fa !important;
+      border-top: 2px solid #1e3c5c;
+      color: #0b2a41;
+    }
+
+    .report-summary-cards {
+      display: flex;
+      gap: 0.8rem;
+      flex-wrap: wrap;
+      margin: 1.2rem 0;
+    }
+
+    .report-summary-card {
+      flex: 1 1 110px;
+      background: #f8fafd;
+      border: 1px solid #e2eaf3;
+      border-radius: 14px;
+      padding: 0.8rem;
+      text-align: center;
+    }
+
+    .report-summary-card .rsl {
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: #52718e;
+      letter-spacing: 0.04em;
+    }
+
+    .report-summary-card .rsv {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: #0b2a41;
+    }
+
+    .report-footer {
+      margin-top: 1.5rem;
+      padding-top: 1rem;
+      border-top: 1px solid #e2eaf3;
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      color: #8399ad;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .report-signature {
+      margin-top: 2.5rem;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 2rem;
+    }
+
+    .report-signature .sig-block {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.2rem;
+      min-width: 160px;
+    }
+
+    .report-signature .sig-line {
+      width: 100%;
+      border-top: 1px solid #1e3c5c;
+      margin-top: 2.5rem;
+    }
+
+    .report-signature .sig-label {
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: #52718e;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    /* history */
+    .history-list {
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+
+    .history-item {
+      background: #f8fafd;
+      border-radius: 1.2rem;
+      padding: 0.9rem 1.2rem;
+      border: 1px solid #e2eaf3;
+      font-size: 0.9rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .history-item .date-label {
+      font-weight: 600;
+      color: #1e3c5c;
+    }
+
+    .history-item .stats {
+      display: flex;
+      gap: 0.8rem;
+      color: #5f7d9c;
+      font-size: 0.8rem;
+    }
+
+    /* toast */
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: #1e3c5c;
+      color: white;
+      padding: 0.8rem 1.8rem;
+      border-radius: 60px;
+      font-weight: 500;
+      font-size: 0.9rem;
+      box-shadow: 0 12px 24px -10px rgba(0, 0, 0, 0.3);
+      z-index: 2000;
+      opacity: 0;
+      transition: 0.25s ease;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    /* print styles */
+    @media print {
+      body * { visibility: hidden !important; }
+      #printArea, #printArea * { visibility: visible !important; }
+      #printArea {
+        position: absolute !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 100% !important;
+        min-height: auto !important;
+        background: white !important;
+        padding: 1.5rem !important;
+        display: block !important;
+        overflow: visible !important;
+      }
+      .no-print { display: none !important; }
+
+      /* larger, bolder text for print receipt */
+      #printArea .report-header h1 {
+        font-size: 2.4rem !important;
+        font-weight: 800 !important;
+      }
+      #printArea .report-header .shop-sub,
+      #printArea .report-header .report-title {
+        font-size: 1.3rem !important;
+        font-weight: 700 !important;
+      }
+      #printArea .report-profile-info h2 {
+        font-size: 2rem !important;
+        font-weight: 800 !important;
+      }
+      #printArea .report-profile-info .role {
+        font-size: 1.1rem !important;
+        font-weight: 600 !important;
+      }
+      #printArea .report-detail-item .dv,
+      #printArea .report-detail-item .dl {
+        font-size: 1.05rem !important;
+        font-weight: 700 !important;
+      }
+      #printArea .report-table th,
+      #printArea .report-table td {
+        font-size: 1rem !important;
+        font-weight: 700 !important;
+      }
+      #printArea .report-summary-card .rsl,
+      #printArea .report-summary-card .rsv {
+        font-size: 1.1rem !important;
+        font-weight: 800 !important;
+      }
+      #printArea .report-footer,
+      #printArea .report-signature .sig-label {
+        font-size: 0.95rem !important;
+        font-weight: 600 !important;
+      }
+    }
+
+    /* dark mode */
+    body.dark {
+      background: #0f1a24;
+    }
+
+    body.dark .register-container {
+      background: #1a2a38;
+      border-color: #2a3f52;
+      box-shadow: 0 30px 50px -20px #000000;
+    }
+
+    body.dark .shop-title h1 { color: #e3edf6; }
+    body.dark .shop-title .sub { background: #2a3f52; color: #b0c8dd; }
+    body.dark .stat-card { background: #203040; border-color: #2e4258; }
+    body.dark .stat-card .value { color: #e3edf6; }
+    body.dark .stat-card .label { color: #8eaec9; }
+    body.dark .toolbar { background: #203040; }
+    body.dark .toolbar input, body.dark .toolbar textarea { background: #1a2a38; border-color: #3a5268; color: #e3edf6; }
+    body.dark .table-wrapper { background: #1a2a38; border-color: #2e4258; }
+    body.dark th { background: #203040; color: #b0c8dd; border-bottom-color: #2e4258; }
+    body.dark td { border-bottom-color: #253b4e; color: #cbdae8; }
+    body.dark tr:hover td { background: #1f3242; }
+    body.dark .employee-name { color: #e3edf6; }
+    body.dark .employee-name .avatar { background: #2e4258; color: #b0c8dd; }
+    body.dark .employee-name .role-badge { background: #2e4258; color: #8eaec9; }
+    body.dark .contact-info { color: #9eb8d0; }
+    body.dark .contact-info .label { color: #7f9bb8; }
+    body.dark .footer-actions .summary { background: #203040; color: #b0c8dd; }
+    body.dark .btn-secondary { background: #203040; border-color: #3a5268; color: #cbdae8; }
+    body.dark .btn-secondary:hover { background: #2a3f52; }
+    body.dark .modal { background: #1a2a38; }
+    body.dark .modal-header h2 { color: #e3edf6; }
+    body.dark .modal-close { background: #2e4258; color: #b0c8dd; }
+    body.dark .modal-close:hover { background: #3a5268; }
+    body.dark .history-item { background: #203040; border-color: #2e4258; color: #cbdae8; }
+    body.dark .date-badge { background: #2e4258; }
+    body.dark .theme-toggle { background: #2e4258; border-color: #3a5268; color: #e3edf6; }
+    body.dark .form-group input, body.dark .form-group textarea { background: #1a2a38; border-color: #3a5268; color: #e3edf6; }
+    body.dark .form-group label { color: #8eaec9; }
+    body.dark .report-container { background: #1a2a38; color: #cbdae8; }
+    body.dark .report-header h1 { color: #e3edf6; }
+    body.dark .report-profile-info h2 { color: #e3edf6; }
+    body.dark .report-detail-item { background: #203040; border-color: #2e4258; }
+    body.dark .report-detail-item .dv { color: #e3edf6; }
+    body.dark .report-table td { border-bottom-color: #2e4258; color: #cbdae8; }
+    body.dark .report-table tr:nth-child(even) td { background: #203040; }
+    body.dark .report-table .total-row td { background: #2e4258 !important; color: #e3edf6; }
+    body.dark .report-summary-card { background: #203040; border-color: #2e4258; }
+    body.dark .report-summary-card .rsv { color: #e3edf6; }
+    body.dark .modal-actions { border-top-color: #2e4258; }
+
+    @media (max-width: 700px) {
+      body { padding: 0.8rem; }
+      .register-container { padding: 1.2rem 0.9rem; border-radius: 1.5rem; }
+      .shop-title h1 { font-size: 1.5rem; }
+      .shop-icon { width: 44px; height: 44px; font-size: 1.5rem; }
+      .toolbar button { width: 100%; justify-content: center; }
+      .toolbar input, .toolbar textarea { width: 100%; }
+      .stat-card .value { font-size: 1.7rem; }
+      .footer-actions { flex-direction: column; align-items: stretch; }
+      .btn-group { justify-content: stretch; }
+      .btn-group button { flex: 1; justify-content: center; }
+      .form-grid { grid-template-columns: 1fr; }
+      .form-grid .full-width { grid-column: span 1; }
+      .report-details-grid { grid-template-columns: 1fr; }
+      .report-profile { flex-direction: column; text-align: center; }
+    }
+
+    /* tablet / small desktop */
+    @media (max-width: 1024px) and (min-width: 701px) {
+      .register-container { padding: 1.5rem 1.2rem; }
+      .shop-title h1 { font-size: 1.7rem; }
+      .stat-card .value { font-size: 1.9rem; }
+      .toolbar { flex-wrap: wrap; }
+      .toolbar input { flex: 1 1 140px; }
+      .toolbar button { flex: 0 1 auto; }
+    }
+
+    /* very small phones (older iPhones, SE) */
+    @media (max-width: 360px) {
+      body { padding: 0.5rem; }
+      .register-container { padding: 1rem 0.7rem; border-radius: 1.2rem; }
+      .shop-title h1 { font-size: 1.3rem; }
+      .shop-icon { width: 38px; height: 38px; font-size: 1.3rem; }
+      .stat-card { padding: 0.8rem 0.6rem; flex: 1 1 45%; }
+      .stat-card .value { font-size: 1.5rem; }
+      .toolbar { gap: 0.5rem; padding: 0.7rem 0.8rem; }
+      .toolbar input { font-size: 0.8rem; padding: 0.6rem 0.8rem; }
+      .toolbar button { font-size: 0.8rem; padding: 0.6rem 0.9rem; }
+      table { min-width: 900px; font-size: 0.75rem; }
+      th, td { padding: 0.5rem 0.6rem; }
+    }
+
+    /* touch-friendly enhancements */
+    @media (hover: none) and (pointer: coarse) {
+      .btn-sm { padding: 0.6rem 0.9rem; font-size: 0.75rem; }
+      .toolbar button, .btn-secondary, .btn-primary { padding: 0.9rem 1.2rem; min-height: 44px; }
+      .stat-card { min-height: 60px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="register-container">
+    <!-- header -->
+    <div class="shop-header">
+      <div class="shop-title">
+        <div class="shop-icon">G</div>
+        <div>
+          <h1>G Mart Traders</h1>
+          <div class="sub">Staff register · complete details & reports</div>
+        </div>
+      </div>
+      <div class="header-right">
+        <div class="date-badge">
+          <span>📅</span>
+          <span id="currentDateDisplay"></span>
+        </div>
+        <button class="theme-toggle" id="themeToggle" title="Toggle dark mode">🌙</button>
+      </div>
+    </div>
+
+    <!-- stats -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="label"><span>👥</span> Total staff</div>
+        <div class="value" id="totalCount">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="label"><span>✅</span> Present</div>
+        <div class="value" id="presentCount">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="label"><span>❌</span> Absent</div>
+        <div class="value" id="absentCount">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="label"><span>⏰</span> Late</div>
+        <div class="value" id="lateCount">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="label"><span>📊</span> Attendance %</div>
+        <div class="value" id="attendancePct">0<small>%</small></div>
+      </div>
+      <div class="stat-card">
+        <div class="label"><span>💰</span> Monthly salary total</div>
+        <div class="value" id="totalSalary">₹0</div>
+      </div>
+    </div>
+
+    <!-- toolbar -->
+    <div class="toolbar">
+      <input type="text" id="employeeNameInput" placeholder="Employee name *" maxlength="40" style="flex:2 1 160px;">
+      <input type="text" id="employeeRoleInput" placeholder="Role" maxlength="20" style="flex:1 1 110px;">
+      <button id="addEmployeeBtn"><span>➕</span> Add staff</button>
+      <input type="text" id="searchInput" placeholder="🔍 Search name / role / mobile ..." style="flex:2 1 180px;">
+      <button id="historyBtn" class="secondary"><span>📜</span> History</button>
+      <button id="exportBtn" class="secondary"><span>📥</span> Export CSV</button>
+    </div>
+
+    <!-- attendance table -->
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Employee</th>
+            <th>Mobile</th>
+            <th>Join date</th>
+            <th>Salary (₹)</th>
+            <th>Address</th>
+            <th>Status</th>
+            <th>Days present</th>
+            <th>Actions</th>
+            <th style="text-align:center;">Today</th>
+          </tr>
+        </thead>
+        <tbody id="attendanceTableBody">
+          <!-- js populates -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- footer actions -->
+    <div class="footer-actions">
+      <div class="summary" id="summaryText">
+        <span><span class="dot green"></span>0 present</span>
+        <span><span class="dot red"></span>0 absent</span>
+        <span><span class="dot orange"></span>0 late</span>
+      </div>
+      <div class="btn-group">
+        <button class="btn-secondary" id="resetAttendanceBtn"><span>🔄</span> Reset today</button>
+        <button class="btn-primary" id="markAllPresentBtn"><span>✅</span> Mark all present</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== EDIT / DETAILS MODAL ===== -->
+  <div class="modal-overlay" id="editModal">
+    <div class="modal wide">
+      <div class="modal-header">
+        <h2 id="editModalTitle">✏️ Edit staff details</h2>
+        <button class="modal-close" id="closeEditBtn">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-grid">
+          <div class="form-group full-width">
+            <label>Full name *</label>
+            <input type="text" id="editName" maxlength="40" placeholder="e.g. Rajesh Kumar">
+          </div>
+          <div class="form-group">
+            <label>Role / designation</label>
+            <input type="text" id="editRole" maxlength="30" placeholder="e.g. Cashier">
+          </div>
+          <div class="form-group">
+            <label>Mobile number</label>
+            <input type="tel" id="editMobile" maxlength="15" placeholder="e.g. 9876543210">
+          </div>
+          <div class="form-group">
+            <label>Date of joining</label>
+            <input type="date" id="editJoinDate">
+          </div>
+          <div class="form-group">
+            <label>Monthly salary (₹)</label>
+            <input type="number" id="editSalary" min="0" step="100" placeholder="e.g. 18000">
+          </div>
+          <div class="form-group">
+            <label>Days present (this month)</label>
+            <input type="number" id="editDaysPresent" min="0" max="31" placeholder="e.g. 22">
+          </div>
+          <div class="form-group">
+            <label>Daily wage (₹) — auto</label>
+            <input type="text" id="editDailyWage" readonly style="background:#f1f6fd;">
+          </div>
+          <div class="form-group full-width">
+            <label>Address</label>
+            <textarea id="editAddress" maxlength="150" placeholder="Street, area, city ..."></textarea>
+          </div>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-secondary" id="cancelEditBtn">Cancel</button>
+        <button class="btn-primary" id="saveEditBtn"><span>💾</span> Save details</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== INDIVIDUAL REPORT MODAL ===== -->
+  <div class="modal-overlay" id="reportModal">
+    <div class="modal wide">
+      <div class="modal-header no-print">
+        <h2>📄 Individual report</h2>
+        <button class="modal-close" id="closeReportBtn">✕</button>
+      </div>
+      <div class="modal-body">
+        <div id="reportContent" class="report-container">
+          <!-- js populates report -->
+        </div>
+      </div>
+      <div class="modal-actions no-print">
+        <button class="btn-secondary" id="closeReportBtn2">Close</button>
+        <button class="btn-secondary" id="pdfReportBtn"><span>📄</span> PDF</button>
+        <button class="btn-secondary" id="whatsappReportBtn"><span>💬</span> WhatsApp</button>
+        <button class="btn-primary" id="printReportBtn"><span>🖨️</span> Print report</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== HISTORY MODAL ===== -->
+  <div class="modal-overlay" id="historyModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>📜 Attendance history</h2>
+        <button class="modal-close" id="closeHistoryBtn">✕</button>
+      </div>
+      <div class="history-list" id="historyList">
+        <!-- js populates -->
+      </div>
+    </div>
+  </div>
+
+  <!-- toast -->
+  <div class="toast" id="toast"></div>
+
+  <!-- hidden print area -->
+  <div id="printArea" style="display:none;"></div>
+
+  <script>
+    (function() {
+      // ---------- STATE ----------
+      let employees = [];  // { id, name, role, mobile, joinDate, salary, daysPresent, address, present, late }
+      let nextId = 1;
+      let history = [];
+      let currentFilter = '';
+      let editingId = null;
+      let currentReportId = null;
+
+      // DOM refs
+      const tbody = document.getElementById('attendanceTableBody');
+      const employeeNameInput = document.getElementById('employeeNameInput');
+      const employeeRoleInput = document.getElementById('employeeRoleInput');
+      const addEmployeeBtn = document.getElementById('addEmployeeBtn');
+      const totalCountSpan = document.getElementById('totalCount');
+      const presentCountSpan = document.getElementById('presentCount');
+      const absentCountSpan = document.getElementById('absentCount');
+      const lateCountSpan = document.getElementById('lateCount');
+      const attendancePctSpan = document.getElementById('attendancePct');
+      const totalSalarySpan = document.getElementById('totalSalary');
+      const summaryText = document.getElementById('summaryText');
+      const currentDateDisplay = document.getElementById('currentDateDisplay');
+      const searchInput = document.getElementById('searchInput');
+      const historyBtn = document.getElementById('historyBtn');
+      const exportBtn = document.getElementById('exportBtn');
+      const themeToggle = document.getElementById('themeToggle');
+      const toast = document.getElementById('toast');
+
+      const editModal = document.getElementById('editModal');
+      const editModalTitle = document.getElementById('editModalTitle');
+      const editName = document.getElementById('editName');
+      const editRole = document.getElementById('editRole');
+      const editMobile = document.getElementById('editMobile');
+      const editJoinDate = document.getElementById('editJoinDate');
+      const editSalary = document.getElementById('editSalary');
+      const editDaysPresent = document.getElementById('editDaysPresent');
+      const editDailyWage = document.getElementById('editDailyWage');
+      const editAddress = document.getElementById('editAddress');
+      const closeEditBtn = document.getElementById('closeEditBtn');
+      const cancelEditBtn = document.getElementById('cancelEditBtn');
+      const saveEditBtn = document.getElementById('saveEditBtn');
+
+      const reportModal = document.getElementById('reportModal');
+      const reportContent = document.getElementById('reportContent');
+      const closeReportBtn = document.getElementById('closeReportBtn');
+      const closeReportBtn2 = document.getElementById('closeReportBtn2');
+      const printReportBtn = document.getElementById('printReportBtn');
+      const pdfReportBtn = document.getElementById('pdfReportBtn');
+      const whatsappReportBtn = document.getElementById('whatsappReportBtn');
+
+      const historyModal = document.getElementById('historyModal');
+      const closeHistoryBtn = document.getElementById('closeHistoryBtn');
+      const historyList = document.getElementById('historyList');
+
+      // ---------- helpers ----------
+      let toastTimer = null;
+      function showToast(msg) {
+        toast.textContent = msg;
+        toast.classList.add('show');
+        if (toastTimer) clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => toast.classList.remove('show'), 2400);
+      }
+
+      function getTodayKey() {
+        return new Date().toISOString().slice(0, 10);
+      }
+
+      function formatDate(dateStr) {
+        if (!dateStr) return '—';
+        try {
+          const d = new Date(dateStr + 'T00:00:00');
+          return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+        } catch { return dateStr; }
+      }
+
+      function formatCurrency(n) {
+        const num = Number(n);
+        if (!num && num !== 0) return '—';
+        return '₹' + num.toLocaleString('en-IN');
+      }
+
+      function getDailyWage(salary) {
+        const s = Number(salary);
+        if (!s) return 0;
+        return Math.round((s / 30) * 100) / 100;
+      }
+
+      function updateDateDisplay() {
+        const today = new Date();
+        currentDateDisplay.textContent = today.toLocaleDateString('en-IN', {
+          weekday: 'short', day: 'numeric', month: 'short', year: 'numeric'
+        });
+      }
+      updateDateDisplay();
+
+      // ---------- storage ----------
+      const STORAGE_KEY = 'gmart_attendance_full';
+      const HISTORY_KEY = 'gmart_attendance_full_history';
+      const THEME_KEY = 'gmart_theme';
+
+      function loadFromStorage() {
+        try {
+          const stored = localStorage.getItem(STORAGE_KEY);
+          if (stored) {
+            const parsed = JSON.parse(stored);
+            if (Array.isArray(parsed.employees)) {
+              employees = parsed.employees.map(e => ({
+                id: e.id,
+                name: e.name || '',
+                role: e.role || '',
+                mobile: e.mobile || '',
+                joinDate: e.joinDate || '',
+                salary: e.salary || '',
+                daysPresent: e.daysPresent || 0,
+                address: e.address || '',
+                present: !!e.present,
+                late: !!e.late,
+              }));
+              const maxId = employees.reduce((m, e) => Math.max(m, e.id || 0), 0);
+              nextId = maxId + 1;
+            }
+          }
+          const hist = localStorage.getItem(HISTORY_KEY);
+          if (hist) {
+            const p = JSON.parse(hist);
+            if (Array.isArray(p)) history = p;
+          }
+        } catch (err) {
+          console.warn(err);
+          employees = [];
+          nextId = 1;
+          history = [];
+        }
+        render();
+      }
+
+      function saveToStorage() {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify({ employees }));
+        } catch (e) { console.warn(e); }
+      }
+
+      function saveHistory() {
+        try { localStorage.setItem(HISTORY_KEY, JSON.stringify(history)); } catch (e) {}
+      }
+
+      // ---------- history snapshot ----------
+      function snapshotToday() {
+        if (employees.length === 0) return;
+        const key = getTodayKey();
+        const present = employees.filter(e => e.present && !e.late).length;
+        const late = employees.filter(e => e.present && e.late).length;
+        const absent = employees.filter(e => !e.present).length;
+        const total = employees.length;
+        const entry = { date: key, present, late, absent, total };
+        const idx = history.findIndex(h => h.date === key);
+        if (idx >= 0) history[idx] = entry;
+        else history.unshift(entry);
+        if (history.length > 90) history = history.slice(0, 90);
+        saveHistory();
+      }
+
+      // ---------- render main table + stats ----------
+      function render() {
+        // Stats
+        const total = employees.length;
+        const present = employees.filter(e => e.present && !e.late).length;
+        const late = employees.filter(e => e.present && e.late).length;
+        const absent = employees.filter(e => !e.present).length;
+        const attended = present + late;
+        const pct = total ? Math.round((attended / total) * 100) : 0;
+
+        const totalSalary = employees.reduce((sum, e) => sum + (Number(e.salary) || 0), 0);
+
+        totalCountSpan.textContent = total;
+        presentCountSpan.textContent = present;
+        absentCountSpan.textContent = absent;
+        lateCountSpan.textContent = late;
+        attendancePctSpan.innerHTML = `${pct}<small>%</small>`;
+        totalSalarySpan.textContent = formatCurrency(totalSalary);
+
+        summaryText.innerHTML = `
+          <span><span class="dot green"></span>${present} present</span>
+          <span><span class="dot red"></span>${absent} absent</span>
+          <span><span class="dot orange"></span>${late} late</span>
+        `;
+
+        // Filter
+        const filtered = employees.filter(e => {
+          if (!currentFilter) return true;
+          const q = currentFilter.toLowerCase();
+          return (e.name || '').toLowerCase().includes(q)
+            || (e.role || '').toLowerCase().includes(q)
+            || (e.mobile || '').toLowerCase().includes(q);
+        });
+
+        tbody.innerHTML = '';
+
+        if (filtered.length === 0) {
+          const tr = document.createElement('tr');
+          tr.className = 'empty-row';
+          tr.innerHTML = `<td colspan="9">${employees.length === 0 ? 'No staff added yet. Add your first employee above.' : 'No employees match your search.'}</td>`;
+          tbody.appendChild(tr);
+          return;
+        }
+
+        filtered.forEach(emp => {
+          const tr = document.createElement('tr');
+
+          // 1. Employee
+          const tdName = document.createElement('td');
+          const nameDiv = document.createElement('div');
+          nameDiv.className = 'employee-name';
+          const avatar = document.createElement('span');
+          avatar.className = 'avatar';
+          avatar.textContent = (emp.name.trim().charAt(0) || '?').toUpperCase();
+          const nameText = document.createElement('div');
+          nameText.className = 'name-text';
+          const ns = document.createElement('span');
+          ns.textContent = emp.name;
+          nameText.appendChild(ns);
+          if (emp.role) {
+            const rb = document.createElement('span');
+            rb.className = 'role-badge';
+            rb.textContent = emp.role;
+            nameText.appendChild(rb);
+          }
+          nameDiv.appendChild(avatar);
+          nameDiv.appendChild(nameText);
+          tdName.appendChild(nameDiv);
+          tr.appendChild(tdName);
+
+          // 2. Mobile
+          const tdMobile = document.createElement('td');
+          tdMobile.innerHTML = `<div class="contact-info">${emp.mobile || '—'}</div>`;
+          tr.appendChild(tdMobile);
+
+          // 3. Join date
+          const tdJoin = document.createElement('td');
+          tdJoin.innerHTML = `<div class="contact-info">${emp.joinDate ? formatDate(emp.joinDate) : '—'}</div>`;
+          tr.appendChild(tdJoin);
+
+          // 4. Salary
+          const tdSalary = document.createElement('td');
+          tdSalary.innerHTML = `<div class="contact-info">${emp.salary ? formatCurrency(emp.salary) : '—'}</div>`;
+          tr.appendChild(tdSalary);
+
+          // 5. Address
+          const tdAddr = document.createElement('td');
+          tdAddr.innerHTML = `<div class="contact-info" style="max-width:160px;white-space:normal;word-break:break-word;">${emp.address || '—'}</div>`;
+          tr.appendChild(tdAddr);
+
+          // 6. Status
+          const tdStatus = document.createElement('td');
+          const badge = document.createElement('span');
+          if (!emp.present) {
+            badge.className = 'status-badge status-absent';
+            badge.textContent = 'Absent';
+          } else if (emp.late) {
+            badge.className = 'status-badge status-late';
+            badge.textContent = 'Late';
+          } else {
+            badge.className = 'status-badge status-present';
+            badge.textContent = 'Present';
+          }
+          tdStatus.appendChild(badge);
+          tr.appendChild(tdStatus);
+
+          // 7. Days present
+          const tdDays = document.createElement('td');
+          tdDays.innerHTML = `<strong>${emp.daysPresent || 0}</strong> days`;
+          tr.appendChild(tdDays);
+
+          // 8. Actions
+          const tdActions = document.createElement('td');
+          const actDiv = document.createElement('div');
+          actDiv.className = 'actions';
+
+          const pBtn = document.createElement('button');
+          pBtn.className = 'btn-sm btn-present';
+          pBtn.textContent = '✅';
+          pBtn.title = 'Mark present';
+          pBtn.addEventListener('click', () => {
+            if (emp.present && !emp.late) return;
+            emp.present = true;
+            emp.late = false;
+            emp.daysPresent = (emp.daysPresent || 0) + 1;
+            saveToStorage();
+            snapshotToday();
+            render();
+            showToast(`${emp.name} marked present (+1 day)`);
+          });
+
+          const lBtn = document.createElement('button');
+          lBtn.className = 'btn-sm btn-late';
+          lBtn.textContent = '⏰';
+          lBtn.title = 'Mark late';
+          lBtn.addEventListener('click', () => {
+            if (emp.present && emp.late) return;
+            emp.present = true;
+            emp.late = true;
+            emp.daysPresent = (emp.daysPresent || 0) + 1;
+            saveToStorage();
+            snapshotToday();
+            render();
+            showToast(`${emp.name} marked late (+1 day)`);
+          });
+
+          const aBtn = document.createElement('button');
+          aBtn.className = 'btn-sm btn-absent';
+          aBtn.textContent = '❌';
+          aBtn.title = 'Mark absent';
+          aBtn.addEventListener('click', () => {
+            if (!emp.present) return;
+            emp.present = false;
+            emp.late = false;
+            emp.daysPresent = Math.max(0, (emp.daysPresent || 0) - 1);
+            saveToStorage();
+            snapshotToday();
+            render();
+            showToast(`${emp.name} marked absent (-1 day)`);
+          });
+
+          const eBtn = document.createElement('button');
+          eBtn.className = 'btn-sm btn-report';
+          eBtn.textContent = '✏️';
+          eBtn.title = 'Edit details';
+          eBtn.addEventListener('click', () => openEditModal(emp.id));
+
+          const rBtn = document.createElement('button');
+          rBtn.className = 'btn-sm btn-report';
+          rBtn.textContent = '📄';
+          rBtn.title = 'Individual report';
+          rBtn.addEventListener('click', () => openReport(emp.id));
+
+          const dBtn = document.createElement('button');
+          dBtn.className = 'btn-sm btn-remove';
+          dBtn.textContent = '🗑️';
+          dBtn.title = 'Remove';
+          dBtn.addEventListener('click', () => {
+            if (confirm(`Remove ${emp.name} completely?`)) {
+              employees = employees.filter(e => e.id !== emp.id);
+              saveToStorage();
+              snapshotToday();
+              render();
+              showToast(`${emp.name} removed`);
+            }
+          });
+
+          actDiv.append(pBtn, lBtn, aBtn, eBtn, rBtn, dBtn);
+          tdActions.appendChild(actDiv);
+          tr.appendChild(tdActions);
+
+          // 9. Today icon
+          const tdToday = document.createElement('td');
+          tdToday.style.textAlign = 'center';
+          tdToday.style.fontSize = '1.3rem';
+          if (!emp.present) tdToday.textContent = '❌';
+          else if (emp.late) tdToday.textContent = '⏰';
+          else tdToday.textContent = '✅';
+          tr.appendChild(tdToday);
+
+          tbody.appendChild(tr);
+        });
+      }
+
+      // ---------- add employee ----------
+      function addEmployee() {
+        const name = employeeNameInput.value.trim();
+        const role = employeeRoleInput.value.trim();
+        if (!name) { showToast('Please enter employee name.'); return; }
+        if (employees.some(e => e.name.toLowerCase() === name.toLowerCase())) {
+          showToast(`"${name}" already exists.`);
+          return;
+        }
+        const newEmp = {
+          id: nextId++,
+          name,
+          role,
+          mobile: '',
+          joinDate: new Date().toISOString().slice(0, 10),
+          salary: '',
+          daysPresent: 0,
+          address: '',
+          present: false,
+          late: false,
+        };
+        employees.push(newEmp);
+        saveToStorage();
+        snapshotToday();
+        render();
+        employeeNameInput.value = '';
+        employeeRoleInput.value = '';
+        employeeNameInput.focus();
+        showToast(`${name} added. Click ✏️ to fill full details.`);
+      }
+
+      // ---------- edit modal ----------
+      function openEditModal(id) {
+        const emp = employees.find(e => e.id === id);
+        if (!emp) return;
+        editingId = id;
+        editModalTitle.textContent = `✏️ Edit details — ${emp.name}`;
+        editName.value = emp.name || '';
+        editRole.value = emp.role || '';
+        editMobile.value = emp.mobile || '';
+        editJoinDate.value = emp.joinDate || '';
+        editSalary.value = emp.salary || '';
+        editDaysPresent.value = emp.daysPresent || 0;
+        editAddress.value = emp.address || '';
+        updateDailyWageDisplay();
+        editModal.classList.add('active');
+      }
+
+      function closeEditModal() {
+        editModal.classList.remove('active');
+        editingId = null;
+      }
+
+      function updateDailyWageDisplay() {
+        const sal = Number(editSalary.value) || 0;
+        editDailyWage.value = sal ? '₹' + getDailyWage(sal).toFixed(2) : '—';
+      }
+
+      function saveEdit() {
+        if (!editingId) return;
+        const emp = employees.find(e => e.id === editingId);
+        if (!emp) return;
+        const newName = editName.value.trim();
+        if (!newName) { showToast('Name cannot be empty.'); return; }
+        // duplicate check (excluding self)
+        if (employees.some(e => e.id !== editingId && e.name.toLowerCase() === newName.toLowerCase())) {
+          showToast('Another employee already has this name.');
+          return;
+        }
+        emp.name = newName;
+        emp.role = editRole.value.trim();
+        emp.mobile = editMobile.value.trim();
+        emp.joinDate = editJoinDate.value;
+        emp.salary = editSalary.value;
+        emp.daysPresent = Number(editDaysPresent.value) || 0;
+        emp.address = editAddress.value.trim();
+        saveToStorage();
+        snapshotToday();
+        render();
+        closeEditModal();
+        showToast(`Details saved for ${emp.name}`);
+      }
+
+      // ---------- report ----------
+      function openReport(id) {
+        const emp = employees.find(e => e.id === id);
+        if (!emp) return;
+        currentReportId = id;
+        renderReport(emp);
+        reportModal.classList.add('active');
+      }
+
+      function renderReport(emp) {
+        const today = new Date().toLocaleDateString('en-IN', {
+          day: 'numeric', month: 'long', year: 'numeric'
+        });
+        const dailyWage = emp.salary ? getDailyWage(emp.salary) : 0;
+        const monthlyEarned = dailyWage * (emp.daysPresent || 0);
+        const joinFormatted = emp.joinDate ? formatDate(emp.joinDate) : '—';
+        const statusToday = !emp.present ? 'Absent' : (emp.late ? 'Late' : 'Present');
+        const initial = (emp.name.trim().charAt(0) || '?').toUpperCase();
+
+        // attendance percentage based on days present / 30
+        const monthDays = 30;
+        const attPct = Math.min(100, Math.round(((emp.daysPresent || 0) / monthDays) * 100));
+
+        reportContent.innerHTML = `
+          <div class="report-header">
+            <h1>G MART TRADERS</h1>
+            <div class="shop-sub">Staff Attendance & Salary Report</div>
+            <div class="report-title">Individual Report</div>
+          </div>
+
+          <div class="report-profile">
+            <div class="report-avatar">${initial}</div>
+            <div class="report-profile-info">
+              <h2>${emp.name}</h2>
+              <div class="role">${emp.role || 'Staff member'}</div>
+            </div>
+          </div>
+
+          <div class="report-details-grid">
+            <div class="report-detail-item">
+              <span class="dl">Mobile number</span>
+              <span class="dv">${emp.mobile || '—'}</span>
+            </div>
+            <div class="report-detail-item">
+              <span class="dl">Date of joining</span>
+              <span class="dv">${joinFormatted}</span>
+            </div>
+            <div class="report-detail-item">
+              <span class="dl">Monthly salary</span>
+              <span class="dv">${emp.salary ? formatCurrency(emp.salary) : '—'}</span>
+            </div>
+            <div class="report-detail-item">
+              <span class="dl">Daily wage (salary / 30)</span>
+              <span class="dv">${dailyWage ? formatCurrency(dailyWage) : '—'}</span>
+            </div>
+            <div class="report-detail-item" style="grid-column: span 2;">
+              <span class="dl">Address</span>
+              <span class="dv">${emp.address || '—'}</span>
+            </div>
+          </div>
+
+          <div class="report-summary-cards">
+            <div class="report-summary-card">
+              <div class="rsl">Days present</div>
+              <div class="rsv">${emp.daysPresent || 0}</div>
+            </div>
+            <div class="report-summary-card">
+              <div class="rsl">Attendance %</div>
+              <div class="rsv">${attPct}%</div>
+            </div>
+            <div class="report-summary-card">
+              <div class="rsl">Salary earned</div>
+              <div class="rsv">${monthlyEarned ? formatCurrency(monthlyEarned) : '—'}</div>
+            </div>
+            <div class="report-summary-card">
+              <div class="rsl">Today's status</div>
+              <div class="rsv" style="font-size:1.1rem;">${statusToday}</div>
+            </div>
+          </div>
+
+          <table class="report-table">
+            <thead>
+              <tr>
+                <th>Description</th>
+                <th>Value</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Total days present (this month)</td><td>${emp.daysPresent || 0} days</td></tr>
+              <tr><td>Daily wage</td><td>${dailyWage ? formatCurrency(dailyWage) : '—'}</td></tr>
+              <tr><td>Salary for days present</td><td>${monthlyEarned ? formatCurrency(monthlyEarned) : '—'}</td></tr>
+              <tr><td>Monthly salary (full)</td><td>${emp.salary ? formatCurrency(emp.salary) : '—'}</td></tr>
+              <tr><td>Attendance percentage</td><td>${attPct}%</td></tr>
+              <tr class="total-row">
+                <td>Estimated net payable (based on attendance)</td>
+                <td>${monthlyEarned ? formatCurrency(monthlyEarned) : '—'}</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="report-signature">
+            <div class="sig-block">
+              <div class="sig-line"></div>
+              <div class="sig-label">Employee signature</div>
+            </div>
+            <div class="sig-block">
+              <div class="sig-line"></div>
+              <div class="sig-label">Authorised signatory</div>
+            </div>
+          </div>
+
+          <div class="report-footer">
+            <span>Report generated on: ${today}</span>
+            <span>G Mart Traders · Staff register</span>
+          </div>
+        `;
+      }
+
+      function closeReportModal() {
+        reportModal.classList.remove('active');
+        currentReportId = null;
+      }
+
+      function printReport() {
+        if (!currentReportId) return;
+        const emp = employees.find(e => e.id === currentReportId);
+        if (!emp) return;
+        const printArea = document.getElementById('printArea');
+        printArea.innerHTML = reportContent.innerHTML;
+        printArea.style.display = 'block';
+        setTimeout(() => {
+          window.print();
+          printArea.style.display = 'none';
+        }, 500);
+      }
+
+      function downloadPDF() {
+        if (!currentReportId) return;
+        const emp = employees.find(e => e.id === currentReportId);
+        if (!emp) return;
+        const printArea = document.getElementById('printArea');
+        printArea.innerHTML = reportContent.innerHTML;
+        printArea.style.display = 'block';
+        const opt = {
+          margin:       [0.3, 0.3, 0.3, 0.3],
+          filename:     `${(emp.name || 'report').replace(/\s+/g, '_')}_report.pdf`,
+          image:        { type: 'jpeg', quality: 0.98 },
+          html2canvas:  { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
+          jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+        setTimeout(() => {
+          html2pdf().set(opt).from(printArea).save().then(() => {
+            printArea.style.display = 'none';
+          }).catch(() => {
+            printArea.style.display = 'none';
+            showToast('PDF generation failed');
+          });
+        }, 300);
+      }
+
+      function sendViaWhatsApp() {
+        if (!currentReportId) return;
+        const emp = employees.find(e => e.id === currentReportId);
+        if (!emp) return;
+        const today = new Date().toLocaleDateString('en-IN');
+        const statusToday = !emp.present ? 'Absent' : (emp.late ? 'Late' : 'Present');
+        const msg = `*G MART TRADERS - Staff Report*%0A%0A` +
+          `*Employee:* ${emp.name}%0A` +
+          `*Role:* ${emp.role || 'Staff'}%0A` +
+          `*Mobile:* ${emp.mobile || '—'}%0A` +
+          `*Date of joining:* ${emp.joinDate ? formatDate(emp.joinDate) : '—'}%0A` +
+          `*Monthly salary:* ${emp.salary ? formatCurrency(emp.salary) : '—'}%0A` +
+          `*Days present:* ${emp.daysPresent || 0}%0A` +
+          `*Today's status:* ${statusToday}%0A%0A` +
+          `*G Mart Traders · Staff register*%0A` +
+          `Generated on: ${today}`;
+        const url = 'https://wa.me/?text=' + encodeURIComponent(msg);
+        window.open(url, '_blank', 'noopener,noreferrer');
+      }
+
+      // ---------- history ----------
+      function openHistory() {
+        historyList.innerHTML = '';
+        if (history.length === 0) {
+          historyList.innerHTML = '<div style="padding:1rem;text-align:center;color:#8399ad;">No history yet. Start marking attendance to build history.</div>';
+        } else {
+          history.forEach(h => {
+            const item = document.createElement('div');
+            item.className = 'history-item';
+            const d = new Date(h.date + 'T00:00:00');
+            const ds = d.toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+            item.innerHTML = `
+              <span class="date-label">${ds}</span>
+              <span class="stats">
+                <span>✅ ${h.present}</span>
+                <span>⏰ ${h.late || 0}</span>
+                <span>❌ ${h.absent}</span>
+                <span>👥 ${h.total}</span>
+              </span>
+            `;
+            historyList.appendChild(item);
+          });
+        }
+        historyModal.classList.add('active');
+      }
+
+      function closeHistoryModal() {
+        historyModal.classList.remove('active');
+      }
+
+      // ---------- export CSV ----------
+      function exportCSV() {
+        if (employees.length === 0) { showToast('Nothing to export.'); return; }
+        const headers = ['Name','Role','Mobile','Join Date','Salary','Days Present','Daily Wage','Earned','Address','Today Status'];
+        const today = new Date().toLocaleDateString('en-IN');
+        const rows = employees.map(e => {
+          let status = 'Absent';
+          if (e.present && e.late) status = 'Late';
+          else if (e.present) status = 'Present';
+          const daily = e.salary ? getDailyWage(e.salary) : '';
+          const earned = daily ? (daily * (e.daysPresent || 0)).toFixed(2) : '';
+          return [
+            `"${(e.name||'').replace(/"/g,'""')}"`,
+            `"${(e.role||'').replace(/"/g,'""')}"`,
+            `"${(e.mobile||'').replace(/"/g,'""')}"`,
+            `"${e.joinDate||''}"`,
+            e.salary || '',
+            e.daysPresent || 0,
+            daily,
+            earned,
+            `"${(e.address||'').replace(/"/g,'""')}"`,
+            status,
+          ].join(',');
+        });
+        const csv = [headers.join(','), ...rows].join('\n');
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `gmart_staff_${getTodayKey()}.csv`;
+        link.click();
+        URL.revokeObjectURL(link.href);
+        showToast('CSV exported');
+      }
+
+      // ---------- mark all / reset ----------
+      function markAllPresent() {
+        if (!employees.length) { showToast('No staff.'); return; }
+        employees.forEach(e => {
+          if (!e.present) e.daysPresent = (e.daysPresent || 0) + 1;
+          e.present = true;
+          e.late = false;
+        });
+        saveToStorage();
+        snapshotToday();
+        render();
+        showToast('All staff marked present');
+      }
+
+      function resetAttendance() {
+        if (!employees.length) { showToast('No staff.'); return; }
+        if (!confirm('Reset today\'s attendance? Days-present counters will decrease for those currently marked.')) return;
+        employees.forEach(e => {
+          if (e.present) e.daysPresent = Math.max(0, (e.daysPresent || 0) - 1);
+          e.present = false;
+          e.late = false;
+        });
+        saveToStorage();
+        snapshotToday();
+        render();
+        showToast('Attendance reset');
+      }
+
+      // ---------- theme ----------
+      function toggleTheme() {
+        document.body.classList.toggle('dark');
+        const isDark = document.body.classList.contains('dark');
+        themeToggle.textContent = isDark ? '☀️' : '🌙';
+        localStorage.setItem(THEME_KEY, isDark ? 'dark' : 'light');
+      }
+
+      function loadTheme() {
+        if (localStorage.getItem(THEME_KEY) === 'dark') {
+          document.body.classList.add('dark');
+          themeToggle.textContent = '☀️';
+        }
+      }
+
+      // ---------- events ----------
+      addEmployeeBtn.addEventListener('click', addEmployee);
+      employeeNameInput.addEventListener('keypress', e => { if (e.key === 'Enter') { e.preventDefault(); addEmployee(); } });
+      employeeRoleInput.addEventListener('keypress', e => { if (e.key === 'Enter') { e.preventDefault(); addEmployee(); } });
+      searchInput.addEventListener('input', e => { currentFilter = e.target.value.trim(); render(); });
+
+      document.getElementById('markAllPresentBtn').addEventListener('click', markAllPresent);
+      document.getElementById('resetAttendanceBtn').addEventListener('click', resetAttendance);
+      historyBtn.addEventListener('click', openHistory);
+      exportBtn.addEventListener('click', exportCSV);
+      themeToggle.addEventListener('click', toggleTheme);
+
+      closeEditBtn.addEventListener('click', closeEditModal);
+      cancelEditBtn.addEventListener('click', closeEditModal);
+      saveEditBtn.addEventListener('click', saveEdit);
+      editSalary.addEventListener('input', updateDailyWageDisplay);
+      editModal.addEventListener('click', e => { if (e.target === editModal) closeEditModal(); });
+
+      closeReportBtn.addEventListener('click', closeReportModal);
+      closeReportBtn2.addEventListener('click', closeReportModal);
+      printReportBtn.addEventListener('click', printReport);
+      pdfReportBtn.addEventListener('click', downloadPDF);
+      whatsappReportBtn.addEventListener('click', sendViaWhatsApp);
+      reportModal.addEventListener('click', e => { if (e.target === reportModal) closeReportModal(); });
+
+      closeHistoryBtn.addEventListener('click', closeHistoryModal);
+      historyModal.addEventListener('click', e => { if (e.target === historyModal) closeHistoryModal(); });
+
+      document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') {
+          if (editModal.classList.contains('active')) closeEditModal();
+          if (reportModal.classList.contains('active')) closeReportModal();
+          if (historyModal.classList.contains('active')) closeHistoryModal();
+        }
+      });
+
+      // ---------- init ----------
+      loadTheme();
+      loadFromStorage();
+
+      // seed demo if empty
+      (function seedIfEmpty() {
+        if (localStorage.getItem(STORAGE_KEY)) return;
+        if (employees.length > 0) return;
+        employees = [
+          { id: nextId++, name: 'Rajesh Kumar', role: 'Manager', mobile: '9876543210', joinDate: '2022-04-01', salary: 35000, daysPresent: 24, address: '12, MG Road, Mumbai', present: true, late: false },
+          { id: nextId++, name: 'Priya Sharma', role: 'Cashier', mobile: '9823456781', joinDate: '2023-01-15', salary: 22000, daysPresent: 22, address: '45, Lake View, Pune', present: true, late: true },
+          { id: nextId++, name: 'Amit Singh', role: 'Stock', mobile: '9911223344', joinDate: '2023-06-10', salary: 18000, daysPresent: 18, address: '78, Sector 5, Delhi', present: false, late: false },
+          { id: nextId++, name: 'Sunita Devi', role: 'Helper', mobile: '9765432109', joinDate: '2024-02-01', salary: 14000, daysPresent: 20, address: '3, Gandhi Nagar, Jaipur', present: true, late: false },
+        ];
+        saveToStorage();
+        render();
+        snapshotToday();
+      })();
+
+    })();
+  </script>
+</body>
+</html>
